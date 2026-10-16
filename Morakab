@@ -1,0 +1,845 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>شبیه‌ساز هوشمند سود مرکب و سرمایه‌گذاری</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Vazirmatn Font -->
+    <link href="https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/Vazirmatn-font-face.css" rel="stylesheet" type="text/css" />
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Vazirmatn', 'sans-serif'],
+                    },
+                    colors: {
+                        slate: {
+                            850: '#111827',
+                            900: '#0B0F19',
+                            950: '#060911',
+                        },
+                        emerald: {
+                            450: '#10B981',
+                        },
+                        gold: {
+                            400: '#FBBF24',
+                            500: '#F59E0B',
+                            600: '#D97706',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            font-family: 'Vazirmatn', sans-serif;
+            background-color: #060911;
+            color: #F8FAFC;
+            overflow-x: hidden;
+        }
+
+        /* استایل سفارشی اسلایدرها */
+        input[type=range] {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 100%;
+            height: 8px;
+            background: #1E293B;
+            border-radius: 999px;
+            outline: none;
+            transition: background 0.3s;
+        }
+
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            background: #10B981;
+            cursor: pointer;
+            border: 3px solid #060911;
+            box-shadow: 0 0 10px rgba(16, 185, 129, 0.6);
+            transition: transform 0.15s ease, background-color 0.15s ease;
+        }
+
+        input[type=range]::-webkit-slider-thumb:hover {
+            transform: scale(1.15);
+            background: #34D399;
+        }
+
+        input[type=range].gold-slider::-webkit-slider-thumb {
+            background: #F59E0B;
+            box-shadow: 0 0 10px rgba(245, 158, 11, 0.6);
+        }
+
+        input[type=range].gold-slider::-webkit-slider-thumb:hover {
+            background: #FBBF24;
+        }
+
+        /* اسکرول‌بار سفارشی */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #0B0F19;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #1E293B;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #334155;
+        }
+
+        .glass-card {
+            background: rgba(17, 24, 39, 0.75);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.07);
+        }
+
+        .glow-emerald {
+            box-shadow: 0 0 25px -5px rgba(16, 185, 129, 0.25);
+        }
+
+        .glow-gold {
+            box-shadow: 0 0 25px -5px rgba(245, 158, 11, 0.25);
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col justify-between selection:bg-emerald-500 selection:text-white">
+
+    <!-- هدر برنامه -->
+    <header class="border-b border-slate-800/80 bg-slate-900/60 backdrop-blur-md sticky top-0 z-30">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex flex-wrap items-center justify-between gap-4">
+            <div class="flex items-center gap-3">
+                <div class="w-11 h-11 rounded-xl bg-gradient-to-br from-emerald-500 to-emerald-700 flex items-center justify-center shadow-lg shadow-emerald-600/30">
+                    <i data-lucide="trending-up" class="w-6 h-6 text-white"></i>
+                </div>
+                <div>
+                    <h1 class="text-xl font-bold bg-gradient-to-l from-white via-slate-100 to-emerald-400 bg-clip-text text-transparent">
+                        شبیه‌ساز هوشمند سود مرکب
+                    </h1>
+                    <p class="text-xs text-slate-400">داشبورد تحلیل رشد سرمایه و برنامه‌ریزی مالی</p>
+                </div>
+            </div>
+
+            <!-- سناریوهای آماده -->
+            <div class="flex items-center gap-2 flex-wrap">
+                <span class="text-xs text-slate-400 ml-1 hidden sm:inline">سناریوهای آماده:</span>
+                <button onclick="applyPreset(50000000, 5000000, 30, 10)" class="text-xs px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 transition flex items-center gap-1.5">
+                    <i data-lucide="shield" class="w-3.5 h-3.5 text-emerald-400"></i>
+                    متعادل (۱۰ ساله)
+                </button>
+                <button onclick="applyPreset(100000000, 10000000, 45, 15)" class="text-xs px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 transition flex items-center gap-1.5">
+                    <i data-lucide="flame" class="w-3.5 h-3.5 text-amber-400"></i>
+                    رشد جسورانه (۱۵ ساله)
+                </button>
+                <button onclick="resetDefaults()" class="text-xs px-3 py-1.5 rounded-lg bg-slate-800/50 hover:bg-rose-950/60 text-slate-400 hover:text-rose-300 border border-slate-800 hover:border-rose-800/50 transition flex items-center gap-1">
+                    <i data-lucide="rotate-ccw" class="w-3.5 h-3.5"></i>
+                    بازنشانی
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- بخش اصلی داشبورد -->
+    <main class="max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 flex-grow">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+
+            <!-- ستون سمت راست: کنترل‌ها و ورودی‌ها (۴ ستون در دسکتاپ) -->
+            <div class="lg:col-span-5 xl:col-span-4 space-y-5 glass-card p-6 rounded-2xl shadow-2xl">
+                <div class="flex items-center justify-between border-b border-slate-800 pb-4">
+                    <h2 class="text-base font-semibold text-white flex items-center gap-2">
+                        <i data-lucide="sliders" class="w-5 h-5 text-emerald-400"></i>
+                        پارامترهای سرمایه‌گذاری
+                    </h2>
+                    <span class="text-xs px-2.5 py-1 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                        محاسبه آنی
+                    </span>
+                </div>
+
+                <!-- ۱. سرمایه اولیه -->
+                <div class="space-y-2.5 pt-1">
+                    <div class="flex justify-between items-center">
+                        <label for="initialInput" class="text-sm text-slate-300 font-medium flex items-center gap-1.5">
+                            <i data-lucide="wallet" class="w-4 h-4 text-emerald-400"></i>
+                            سرمایه اولیه (تومان)
+                        </label>
+                    </div>
+                    <div class="relative">
+                        <input type="text" id="initialInput" value="50,000,000" 
+                            class="w-full bg-slate-900/90 border border-slate-700/80 focus:border-emerald-500 rounded-xl px-4 py-2.5 text-left font-bold text-lg text-emerald-400 focus:outline-none focus:ring-1 focus:ring-emerald-500 transition"
+                            dir="ltr">
+                        <span class="absolute right-3.5 top-3 text-xs text-slate-500 pointer-events-none">مبلغ پایه</span>
+                    </div>
+                    <input type="range" id="initialSlider" min="0" max="1000000000" step="5000000" value="50000000">
+                    <div class="flex justify-between text-[11px] text-slate-500">
+                        <span>۰ تومان</span>
+                        <span>۵۰۰ میلیون</span>
+                        <span>۱ میلیارد تومان</span>
+                    </div>
+                </div>
+
+                <!-- ۲. واریز ماهانه -->
+                <div class="space-y-2.5 pt-3 border-t border-slate-800/60">
+                    <div class="flex justify-between items-center">
+                        <label for="monthlyInput" class="text-sm text-slate-300 font-medium flex items-center gap-1.5">
+                            <i data-lucide="calendar-plus" class="w-4 h-4 text-emerald-400"></i>
+                            مبلغ واریز ماهانه (تومان)
+                        </label>
+                    </div>
+                    <div class="relative">
+                        <input type="text" id="monthlyInput" value="5,000,000" 
+                            class="w-full bg-slate-900/90 border border-slate-700/80 focus:border-emerald-500 rounded-xl px-4 py-2.5 text-left font-bold text-lg text-emerald-400 focus:outline-none focus:ring-1 focus:ring-emerald-500 transition"
+                            dir="ltr">
+                        <span class="absolute right-3.5 top-3 text-xs text-slate-500 pointer-events-none">تداوم ماهانه</span>
+                    </div>
+                    <input type="range" id="monthlySlider" min="0" max="100000000" step="500000" value="5000000">
+                    <div class="flex justify-between text-[11px] text-slate-500">
+                        <span>۰ تومان</span>
+                        <span>۵۰ میلیون</span>
+                        <span>۱۰۰ میلیون تومان</span>
+                    </div>
+                </div>
+
+                <!-- ۳. نرخ سود سالانه -->
+                <div class="space-y-2.5 pt-3 border-t border-slate-800/60">
+                    <div class="flex justify-between items-center">
+                        <label for="rateInput" class="text-sm text-slate-300 font-medium flex items-center gap-1.5">
+                            <i data-lucide="percent" class="w-4 h-4 text-amber-400"></i>
+                            نرخ بازدهی سالانه (درصد)
+                        </label>
+                        <span id="rateBadge" class="text-xs font-bold px-2 py-0.5 rounded bg-amber-500/10 text-amber-400 border border-amber-500/20">30%</span>
+                    </div>
+                    <div class="relative">
+                        <input type="number" id="rateInput" value="30" min="1" max="100" step="0.5"
+                            class="w-full bg-slate-900/90 border border-slate-700/80 focus:border-amber-500 rounded-xl px-4 py-2.5 text-left font-bold text-lg text-amber-400 focus:outline-none focus:ring-1 focus:ring-amber-500 transition"
+                            dir="ltr">
+                        <span class="absolute right-3.5 top-3 text-xs text-slate-500 pointer-events-none">سود سالیانه (%)</span>
+                    </div>
+                    <input type="range" id="rateSlider" class="gold-slider" min="1" max="100" step="0.5" value="30">
+                    <div class="flex justify-between text-[11px] text-slate-500">
+                        <span>۱٪</span>
+                        <span>۵۰٪</span>
+                        <span>۱۰۰٪</span>
+                    </div>
+                </div>
+
+                <!-- ۴. مدت زمان سرمایه‌گذاری -->
+                <div class="space-y-2.5 pt-3 border-t border-slate-800/60">
+                    <div class="flex justify-between items-center">
+                        <label for="yearsInput" class="text-sm text-slate-300 font-medium flex items-center gap-1.5">
+                            <i data-lucide="clock" class="w-4 h-4 text-amber-400"></i>
+                            مدت زمان سرمایه‌گذاری (سال)
+                        </label>
+                        <span id="monthsBadge" class="text-xs text-slate-400">۱۲۰ ماه</span>
+                    </div>
+                    <div class="relative">
+                        <input type="number" id="yearsInput" value="10" min="1" max="40" step="1"
+                            class="w-full bg-slate-900/90 border border-slate-700/80 focus:border-amber-500 rounded-xl px-4 py-2.5 text-left font-bold text-lg text-amber-400 focus:outline-none focus:ring-1 focus:ring-amber-500 transition"
+                            dir="ltr">
+                        <span class="absolute right-3.5 top-3 text-xs text-slate-500 pointer-events-none">افق زمانی (سال)</span>
+                    </div>
+                    <input type="range" id="yearsSlider" class="gold-slider" min="1" max="40" step="1" value="10">
+                    <div class="flex justify-between text-[11px] text-slate-500">
+                        <span>۱ سال</span>
+                        <span>۲۰ سال</span>
+                        <span>۴۰ سال</span>
+                    </div>
+                </div>
+
+                <!-- دوره ترکیب سود -->
+                <div class="pt-3 border-t border-slate-800/60">
+                    <label class="text-xs text-slate-400 block mb-2">نحوه محاسبه و ترکیب سود:</label>
+                    <div class="grid grid-cols-2 gap-2 p-1 bg-slate-900 rounded-xl border border-slate-800">
+                        <button id="compMonthlyBtn" onclick="setCompounding('monthly')" class="py-2 text-xs font-semibold rounded-lg bg-emerald-600 text-white shadow transition">
+                            ترکیب ماهانه (پیشنهادی)
+                        </button>
+                        <button id="compYearlyBtn" onclick="setCompounding('yearly')" class="py-2 text-xs font-semibold rounded-lg text-slate-400 hover:text-white transition">
+                            ترکیب سالانه
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ستون سمت چپ: کارت‌های خلاصه و نمودار (۸ ستون در دسکتاپ) -->
+            <div class="lg:col-span-7 xl:col-span-8 space-y-6">
+
+                <!-- کارت‌های شاخص کلیدی (KPI) -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <!-- مجموع آورده نقدی -->
+                    <div class="glass-card p-5 rounded-2xl border-r-4 border-r-slate-400 flex flex-col justify-between">
+                        <div class="flex items-center justify-between">
+                            <span class="text-xs text-slate-400 font-medium">مجموع آورده نقدی شما</span>
+                            <div class="p-2 rounded-lg bg-slate-800 text-slate-300">
+                                <i data-lucide="coins" class="w-4 h-4"></i>
+                            </div>
+                        </div>
+                        <div class="my-3">
+                            <div id="totalPrincipalCard" class="text-xl xl:text-2xl font-bold text-white tracking-tight">۶۵۰,۰۰۰,۰۰۰</div>
+                            <div class="text-[11px] text-slate-400 mt-1">تومان (اصل پول واریزی)</div>
+                        </div>
+                        <div class="w-full bg-slate-800 h-1.5 rounded-full overflow-hidden">
+                            <div id="principalProgressBar" class="bg-slate-400 h-full rounded-full" style="width: 25%"></div>
+                        </div>
+                    </div>
+
+                    <!-- کل سود خالص -->
+                    <div class="glass-card p-5 rounded-2xl border-r-4 border-r-amber-500 glow-gold flex flex-col justify-between">
+                        <div class="flex items-center justify-between">
+                            <span class="text-xs text-amber-300/90 font-medium">کل سود خالص مرکب</span>
+                            <div class="p-2 rounded-lg bg-amber-500/10 text-amber-400">
+                                <i data-lucide="sparkles" class="w-4 h-4"></i>
+                            </div>
+                        </div>
+                        <div class="my-3">
+                            <div id="totalInterestCard" class="text-xl xl:text-2xl font-bold text-amber-400 tracking-tight">۳,۷۰۵,۴۲۱,۸۱۰</div>
+                            <div class="text-[11px] text-slate-400 mt-1 flex items-center justify-between">
+                                <span>تومان (سود حاصله)</span>
+                                <span id="interestMultiplierBadge" class="text-amber-300 font-semibold">+570% بازده</span>
+                            </div>
+                        </div>
+                        <div class="w-full bg-slate-800 h-1.5 rounded-full overflow-hidden">
+                            <div id="interestProgressBar" class="bg-amber-500 h-full rounded-full" style="width: 75%"></div>
+                        </div>
+                    </div>
+
+                    <!-- ارزش نهایی سرمایه -->
+                    <div class="glass-card p-5 rounded-2xl border-r-4 border-r-emerald-500 glow-emerald flex flex-col justify-between bg-gradient-to-br from-slate-900/90 to-emerald-950/30">
+                        <div class="flex items-center justify-between">
+                            <span class="text-xs text-emerald-300 font-medium">ارزش نهایی سرمایه</span>
+                            <div class="p-2 rounded-lg bg-emerald-500/20 text-emerald-400">
+                                <i data-lucide="gem" class="w-4 h-4"></i>
+                            </div>
+                        </div>
+                        <div class="my-3">
+                            <div id="finalBalanceCard" class="text-xl xl:text-2xl font-extrabold text-emerald-400 tracking-tight">۴,۳۵۵,۴۲۱,۸۱۰</div>
+                            <div id="finalBalanceWords" class="text-[11px] text-emerald-200/80 mt-1 truncate">حدود ۴.۳۶ میلیارد تومان</div>
+                        </div>
+                        <div class="flex items-center justify-between text-[11px] text-slate-400 pt-1 border-t border-slate-800/80">
+                            <span>ضریب رشد کل:</span>
+                            <span id="growthFactorText" class="font-bold text-emerald-400">6.7 برابر آورده</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- بخش نمودار تعاملی -->
+                <div class="glass-card p-6 rounded-2xl shadow-2xl space-y-4">
+                    <div class="flex flex-wrap items-center justify-between gap-4 border-b border-slate-800 pb-4">
+                        <div>
+                            <h3 class="text-base font-semibold text-white flex items-center gap-2">
+                                <i data-lucide="bar-chart-3" class="w-5 h-5 text-emerald-400"></i>
+                                نمودار روند رشد سرمایه به تفکیک سال
+                            </h3>
+                            <p class="text-xs text-slate-400 mt-0.5">مقایسه مجموع آورده نقدی شما در برابر سود مرکب انباشته شده</p>
+                        </div>
+
+                        <!-- تغییر نوع نمودار -->
+                        <div class="flex items-center gap-1.5 bg-slate-900 p-1 rounded-xl border border-slate-800">
+                            <button id="chartTypeBar" onclick="changeChartType('bar')" class="px-3 py-1.5 rounded-lg text-xs font-medium bg-emerald-600 text-white transition flex items-center gap-1">
+                                <i data-lucide="bar-chart-2" class="w-3.5 h-3.5"></i>
+                                ستونی انباشته
+                            </button>
+                            <button id="chartTypeLine" onclick="changeChartType('line')" class="px-3 py-1.5 rounded-lg text-xs font-medium text-slate-400 hover:text-white transition flex items-center gap-1">
+                                <i data-lucide="activity" class="w-3.5 h-3.5"></i>
+                                خطی مساحتی
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- کانواس نمودار -->
+                    <div class="relative h-80 sm:h-96 w-full">
+                        <canvas id="growthChart"></canvas>
+                    </div>
+
+                    <!-- راهنمای تحلیلی هوشمند -->
+                    <div class="bg-slate-900/90 border border-slate-800 rounded-xl p-4 flex items-start gap-3">
+                        <div class="p-2 rounded-lg bg-amber-500/10 text-amber-400 shrink-0 mt-0.5">
+                            <i data-lucide="lightbulb" class="w-5 h-5"></i>
+                        </div>
+                        <p id="smartInsightText" class="text-xs sm:text-sm text-slate-300 leading-relaxed">
+                            در حال تحلیل داده‌های سرمایه‌گذاری شما...
+                        </p>
+                    </div>
+                </div>
+
+                <!-- جدول تفکیک سالانه -->
+                <div class="glass-card rounded-2xl shadow-2xl overflow-hidden">
+                    <div class="p-5 border-b border-slate-800 flex items-center justify-between">
+                        <h3 class="text-base font-semibold text-white flex items-center gap-2">
+                            <i data-lucide="table" class="w-5 h-5 text-amber-400"></i>
+                            جدول جزئیات رشد سال‌به‌سال
+                        </h3>
+                        <span class="text-xs text-slate-400">مبالغ به تومان</span>
+                    </div>
+                    <div class="overflow-x-auto max-h-80">
+                        <table class="w-full text-right text-xs sm:text-sm">
+                            <thead class="bg-slate-900/90 text-slate-400 sticky top-0 z-10 border-b border-slate-800">
+                                <tr>
+                                    <th class="py-3.5 px-4 font-semibold">سال</th>
+                                    <th class="py-3.5 px-4 font-semibold">مجموع آورده نقدی</th>
+                                    <th class="py-3.5 px-4 font-semibold text-amber-400">سود سالانه</th>
+                                    <th class="py-3.5 px-4 font-semibold text-amber-400">کل سود انباشته</th>
+                                    <th class="py-3.5 px-4 font-semibold text-emerald-400">ارزش کل در پایان سال</th>
+                                </tr>
+                            </thead>
+                            <tbody id="yearlyTableBody" class="divide-y divide-slate-800/60 text-slate-300">
+                                <!-- ردیف‌ها با جاوااسکریپت ساخته می‌شوند -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </main>
+
+    <!-- فوتر -->
+    <footer class="border-t border-slate-900 bg-slate-950 py-5 mt-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between text-xs text-slate-500 gap-2">
+            <p>طراحی شده در محیط تعاملی Gemini Canvas • شبیه‌ساز مالی و سود مرکب</p>
+            <p>تمامی محاسبات بر اساس فرمول استاندارد ریاضی سود مرکب انجام می‌شود.</p>
+        </div>
+    </footer>
+
+    <script>
+        // راه‌اندازی آیکون‌های Lucide
+        lucide.createIcons();
+
+        // متغیرهای وضعیت برنامه
+        let compoundingMode = 'monthly'; // 'monthly' یا 'yearly'
+        let currentChartType = 'bar'; // 'bar' یا 'line'
+        let growthChartInstance = null;
+
+        // ارجاع به المان‌های DOM
+        const initialInput = document.getElementById('initialInput');
+        const initialSlider = document.getElementById('initialSlider');
+        const monthlyInput = document.getElementById('monthlyInput');
+        const monthlySlider = document.getElementById('monthlySlider');
+        const rateInput = document.getElementById('rateInput');
+        const rateSlider = document.getElementById('rateSlider');
+        const yearsInput = document.getElementById('yearsInput');
+        const yearsSlider = document.getElementById('yearsSlider');
+
+        // فرمت کردن عدد با کامای سه‌رقمی انگلیسی (مثلاً 50,000,000) برای ورودی‌ها
+        function formatWithCommas(num) {
+            if (isNaN(num) || num === null) return '0';
+            return Math.round(num).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+        }
+
+        // تبدیل ارقام انگلیسی به فارسی همراه با کاما برای نمایش در کارت‌ها و جداول
+        function formatPersianNumber(num) {
+            if (isNaN(num) || num === null) return '۰';
+            const formatted = formatWithCommas(Math.round(num));
+            const persianDigits = ['۰', '۱', '۲', '۳', '۴', '۵', '۶', '۷', '۸', '۹'];
+            return formatted.replace(/\d/g, x => persianDigits[x]);
+        }
+
+        // تبدیل اعداد فارسی یا دارای کاما به عدد خالص انگلیسی جهت محاسبه
+        function parseCleanNumber(str) {
+            if (typeof str === 'number') return str;
+            if (!str) return 0;
+            const persianDigits = [/۰/g, /۱/g, /۲/g, /۳/g, /۴/g, /۵/g, /۶/g, /۷/g, /۸/g, /۹/g];
+            const arabicDigits = [/٠/g, /١/g, /٢/g, /٣/g, /٤/g, /٥/g, /٦/g, /٧/g, /٨/g, /٩/g];
+            let clean = str.toString();
+            for (let i = 0; i < 10; i++) {
+                clean = clean.replace(persianDigits[i], i).replace(arabicDigits[i], i);
+            }
+            clean = clean.replace(/[^0-9.]/g, '');
+            const parsed = parseFloat(clean);
+            return isNaN(parsed) ? 0 : parsed;
+        }
+
+        // تبدیل عدد بزرگ به معادل متنی خوانا (میلیون / میلیارد / همت)
+        function numberToFriendlyWords(num) {
+            if (num >= 1e12) {
+                return `حدود formatPersianFloat(num / 1e12) هزار میلیارد (همت)`.replace('formatPersianFloat(num / 1e12)', toPersianFloat(num / 1e12));
+            } else if (num >= 1e9) {
+                return `معادل ${toPersianFloat(num / 1e9)} میلیارد تومان`;
+            } else if (num >= 1e6) {
+                return `معادل ${toPersianFloat(num / 1e6)} میلیون تومان`;
+            }
+            return `${formatPersianNumber(num)} تومان`;
+        }
+
+        function toPersianFloat(num) {
+            const fixed = num.toFixed(2).replace(/\.00$/, '');
+            const persianDigits = ['۰', '۱', '۲', '۳', '۴', '۵', '۶', '۷', '۸', '۹'];
+            return fixed.replace(/\d/g, x => persianDigits[x]).replace('.', '/');
+        }
+
+        // تابع اصلی محاسبه سود مرکب
+        function calculateCompoundGrowth() {
+            const initial = parseCleanNumber(initialInput.value);
+            const monthly = parseCleanNumber(monthlyInput.value);
+            const annualRate = parseFloat(rateInput.value) || 0;
+            const years = parseInt(yearsInput.value) || 1;
+
+            // بروزرسانی بج‌های راهنما
+            document.getElementById('rateBadge').textContent = `${toPersianFloat(annualRate)}٪`;
+            document.getElementById('monthsBadge').textContent = `${formatPersianNumber(years * 12)} ماه`;
+
+            const labels = [];
+            const principalData = [];
+            const interestData = [];
+            const totalData = [];
+            const yearlyDetails = [];
+
+            let currentBalance = initial;
+            let totalPrincipal = initial;
+            let previousTotalInterest = 0;
+
+            const monthlyRate = (annualRate / 100) / 12;
+            const yearlyRate = annualRate / 100;
+
+            // سال صفر (شروع)
+            labels.push('شروع');
+            principalData.push(initial);
+            interestData.push(0);
+            totalData.push(initial);
+
+            for (let y = 1; y <= years; y++) {
+                if (compoundingMode === 'monthly') {
+                    for (let m = 1; m <= 12; m++) {
+                        // افزودن سود ماهانه و سپس واریز ماهانه
+                        currentBalance = (currentBalance + monthly) * (1 + monthlyRate);
+                        totalPrincipal += monthly;
+                    }
+                } else {
+                    // ترکیب سالانه
+                    const yearlyContribution = monthly * 12;
+                    totalPrincipal += yearlyContribution;
+                    currentBalance = (currentBalance + yearlyContribution) * (1 + yearlyRate);
+                }
+
+                const totalInterestSoFar = Math.max(0, currentBalance - totalPrincipal);
+                const interestThisYear = totalInterestSoFar - previousTotalInterest;
+                previousTotalInterest = totalInterestSoFar;
+
+                labels.push(`سال ${formatPersianNumber(y)}`);
+                principalData.push(Math.round(totalPrincipal));
+                interestData.push(Math.round(totalInterestSoFar));
+                totalData.push(Math.round(currentBalance));
+
+                yearlyDetails.push({
+                    year: y,
+                    principal: totalPrincipal,
+                    yearlyInterest: interestThisYear,
+                    totalInterest: totalInterestSoFar,
+                    balance: currentBalance
+                });
+            }
+
+            const finalBalance = currentBalance;
+            const finalInterest = Math.max(0, finalBalance - totalPrincipal);
+
+            // بروزرسانی کارت‌های بالای صفحه
+            document.getElementById('totalPrincipalCard').textContent = formatPersianNumber(totalPrincipal);
+            document.getElementById('totalInterestCard').textContent = formatPersianNumber(finalInterest);
+            document.getElementById('finalBalanceCard').textContent = formatPersianNumber(finalBalance);
+            document.getElementById('finalBalanceWords').textContent = numberToFriendlyWords(finalBalance);
+
+            // محاسبه درصدها و نوار پیشرفت
+            const principalRatio = finalBalance > 0 ? Math.round((totalPrincipal / finalBalance) * 100) : 100;
+            const interestRatio = 100 - principalRatio;
+
+            document.getElementById('principalProgressBar').style.width = `${principalRatio}%`;
+            document.getElementById('interestProgressBar').style.width = `${interestRatio}%`;
+
+            const returnPercentage = totalPrincipal > 0 ? Math.round((finalInterest / totalPrincipal) * 100) : 0;
+            document.getElementById('interestMultiplierBadge').textContent = `+${formatPersianNumber(returnPercentage)}٪ سود کل`;
+
+            const growthFactor = totalPrincipal > 0 ? (finalBalance / totalPrincipal) : 1;
+            document.getElementById('growthFactorText').textContent = `${toPersianFloat(growthFactor)} برابر آورده`;
+
+            // تولید متن تحلیل هوشمند
+            updateSmartInsight(years, totalPrincipal, finalInterest, finalBalance, interestRatio, yearlyDetails);
+
+            // بروزرسانی نمودار و جدول
+            updateChart(labels, principalData, interestData, totalData);
+            updateYearlyTable(yearlyDetails);
+        }
+
+        function updateSmartInsight(years, principal, interest, total, interestRatio, yearlyDetails) {
+            const insightEl = document.getElementById('smartInsightText');
+            
+            // پیدا کردن سالی که سود مرکب از اصل پول پیشی می‌گیرد
+            const crossoverYear = yearlyDetails.find(item => item.totalInterest > item.principal);
+
+            let message = `در پایان <strong class="text-white">${formatPersianNumber(years)} سال</strong>، از کل سرمایه نهایی شما، <strong class="text-amber-400">${formatPersianNumber(interestRatio)}٪</strong> آن صرفاً از محل سود مرکب ایجاد شده و تنها <strong class="text-slate-200">${formatPersianNumber(100 - interestRatio)}٪</strong> آورده نقدی مستقیم شماست. `;
+
+            if (crossoverYear) {
+                message += `نقطه عطف سرمایه‌گذاری شما در <strong class="text-emerald-400">سال ${formatPersianNumber(crossoverYear.year)}</strong> رخ می‌دهد؛ یعنی جایی که مجموع سود انباشته از کل پول واریزی شما بیشتر می‌شود!`;
+            } else {
+                message += `اگر افق زمانی یا نرخ بازدهی خود را کمی افزایش دهید، به نقطه عطف طلایی (پیشی گرفتن سود از کل آورده نقدی) خواهید رسید.`;
+            }
+
+            insightEl.innerHTML = message;
+        }
+
+        function updateYearlyTable(details) {
+            const tbody = document.getElementById('yearlyTableBody');
+            tbody.innerHTML = '';
+
+            details.forEach(row => {
+                const tr = document.createElement('tr');
+                tr.className = 'hover:bg-slate-800/40 transition';
+                tr.innerHTML = `
+                    <td class="py-3 px-4 font-bold text-slate-200">سال ${formatPersianNumber(row.year)}</td>
+                    <td class="py-3 px-4">${formatPersianNumber(row.principal)}</td>
+                    <td class="py-3 px-4 text-amber-400/90">+${formatPersianNumber(row.yearlyInterest)}</td>
+                    <td class="py-3 px-4 font-medium text-amber-400">${formatPersianNumber(row.totalInterest)}</td>
+                    <td class="py-3 px-4 font-bold text-emerald-400">${formatPersianNumber(row.balance)}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function updateChart(labels, principalData, interestData, totalData) {
+            const ctx = document.getElementById('growthChart').getContext('2d');
+
+            // گرادینت‌های رنگی برای زیبایی نمودار
+            const emeraldGrad = ctx.createLinearGradient(0, 0, 0, 350);
+            emeraldGrad.addColorStop(0, 'rgba(16, 185, 129, 0.85)');
+            emeraldGrad.addColorStop(1, 'rgba(16, 185, 129, 0.15)');
+
+            const goldGrad = ctx.createLinearGradient(0, 0, 0, 350);
+            goldGrad.addColorStop(0, 'rgba(245, 158, 11, 0.9)');
+            goldGrad.addColorStop(1, 'rgba(245, 158, 11, 0.2)');
+
+            if (growthChartInstance) {
+                growthChartInstance.destroy();
+            }
+
+            const isBar = currentChartType === 'bar';
+
+            growthChartInstance = new Chart(ctx, {
+                type: isBar ? 'bar' : 'line',
+                data: {
+                    labels: labels,
+                    datasets: [
+                        {
+                            label: 'مجموع آورده نقدی (اصل پول)',
+                            data: principalData,
+                            backgroundColor: isBar ? '#10B981' : emeraldGrad,
+                            borderColor: '#10B981',
+                            borderWidth: 2,
+                            borderRadius: isBar ? 5 : 0,
+                            fill: !isBar,
+                            tension: 0.35,
+                            stack: 'Stack 0'
+                        },
+                        {
+                            label: 'سود مرکب انباشته',
+                            data: interestData,
+                            backgroundColor: isBar ? '#F59E0B' : goldGrad,
+                            borderColor: '#F59E0B',
+                            borderWidth: 2,
+                            borderRadius: isBar ? 5 : 0,
+                            fill: !isBar,
+                            tension: 0.35,
+                            stack: 'Stack 0'
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    interaction: {
+                        mode: 'index',
+                        intersect: false,
+                    },
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                            align: 'end',
+                            labels: {
+                                color: '#CBD5E1',
+                                font: {
+                                    family: 'Vazirmatn',
+                                    size: 12
+                                },
+                                usePointStyle: true,
+                                boxWidth: 8
+                            }
+                        },
+                        tooltip: {
+                            rtl: true,
+                            backgroundColor: 'rgba(15, 23, 42, 0.95)',
+                            titleColor: '#F8FAFC',
+                            bodyColor: '#E2E8F0',
+                            borderColor: '#334155',
+                            borderWidth: 1,
+                            padding: 12,
+                            titleFont: { family: 'Vazirmatn', size: 13, weight: 'bold' },
+                            bodyFont: { family: 'Vazirmatn', size: 12 },
+                            footerFont: { family: 'Vazirmatn', size: 12, weight: 'bold' },
+                            footerColor: '#34D399',
+                            callbacks: {
+                                label: function(context) {
+                                    const val = context.parsed.y;
+                                    return ` ${context.dataset.label}: ${formatPersianNumber(val)} تومان`;
+                                },
+                                footer: function(tooltipItems) {
+                                    let sum = 0;
+                                    tooltipItems.forEach(item => {
+                                        sum += item.parsed.y;
+                                    });
+                                    return `ارزش کل: ${formatPersianNumber(sum)} تومان`;
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            stacked: true,
+                            grid: {
+                                color: 'rgba(51, 65, 85, 0.2)'
+                            },
+                            ticks: {
+                                color: '#94A3B8',
+                                font: { family: 'Vazirmatn', size: 11 }
+                            }
+                        },
+                        y: {
+                            stacked: true,
+                            grid: {
+                                color: 'rgba(51, 65, 85, 0.25)'
+                            },
+                            ticks: {
+                                color: '#94A3B8',
+                                font: { family: 'Vazirmatn', size: 11 },
+                                callback: function(value) {
+                                    if (value >= 1e12) return toPersianFloat(value / 1e12) + ' همت';
+                                    if (value >= 1e9) return toPersianFloat(value / 1e9) + ' میلیارد';
+                                    if (value >= 1e6) return toPersianFloat(value / 1e6) + ' میلیون';
+                                    return formatPersianNumber(value);
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // همگام‌سازی اسلایدرها و ورودی‌های متنی
+        function setupSyncListeners() {
+            // سرمایه اولیه
+            initialSlider.addEventListener('input', (e) => {
+                initialInput.value = formatWithCommas(e.target.value);
+                calculateCompoundGrowth();
+            });
+            initialInput.addEventListener('input', (e) => {
+                const raw = parseCleanNumber(e.target.value);
+                initialSlider.value = Math.min(raw, initialSlider.max);
+                e.target.value = formatWithCommas(raw);
+                calculateCompoundGrowth();
+            });
+
+            // واریز ماهانه
+            monthlySlider.addEventListener('input', (e) => {
+                monthlyInput.value = formatWithCommas(e.target.value);
+                calculateCompoundGrowth();
+            });
+            monthlyInput.addEventListener('input', (e) => {
+                const raw = parseCleanNumber(e.target.value);
+                monthlySlider.value = Math.min(raw, monthlySlider.max);
+                e.target.value = formatWithCommas(raw);
+                calculateCompoundGrowth();
+            });
+
+            // درصد سود سالانه
+            rateSlider.addEventListener('input', (e) => {
+                rateInput.value = e.target.value;
+                calculateCompoundGrowth();
+            });
+            rateInput.addEventListener('input', (e) => {
+                let val = parseFloat(e.target.value) || 0;
+                if (val > 200) val = 200;
+                rateSlider.value = Math.min(val, rateSlider.max);
+                calculateCompoundGrowth();
+            });
+
+            // مدت زمان (سال)
+            yearsSlider.addEventListener('input', (e) => {
+                yearsInput.value = e.target.value;
+                calculateCompoundGrowth();
+            });
+            yearsInput.addEventListener('input', (e) => {
+                let val = parseInt(e.target.value) || 1;
+                if (val > 60) val = 60;
+                yearsSlider.value = Math.min(val, yearsSlider.max);
+                calculateCompoundGrowth();
+            });
+        }
+
+        // تغییر نوع ترکیب سود (ماهانه یا سالانه)
+        function setCompounding(mode) {
+            compoundingMode = mode;
+            const monthlyBtn = document.getElementById('compMonthlyBtn');
+            const yearlyBtn = document.getElementById('compYearlyBtn');
+
+            if (mode === 'monthly') {
+                monthlyBtn.className = 'py-2 text-xs font-semibold rounded-lg bg-emerald-600 text-white shadow transition';
+                yearlyBtn.className = 'py-2 text-xs font-semibold rounded-lg text-slate-400 hover:text-white transition';
+            } else {
+                yearlyBtn.className = 'py-2 text-xs font-semibold rounded-lg bg-emerald-600 text-white shadow transition';
+                monthlyBtn.className = 'py-2 text-xs font-semibold rounded-lg text-slate-400 hover:text-white transition';
+            }
+            calculateCompoundGrowth();
+        }
+
+        // تغییر حالت نمایش نمودار
+        function changeChartType(type) {
+            currentChartType = type;
+            const barBtn = document.getElementById('chartTypeBar');
+            const lineBtn = document.getElementById('chartTypeLine');
+
+            if (type === 'bar') {
+                barBtn.className = 'px-3 py-1.5 rounded-lg text-xs font-medium bg-emerald-600 text-white transition flex items-center gap-1';
+                lineBtn.className = 'px-3 py-1.5 rounded-lg text-xs font-medium text-slate-400 hover:text-white transition flex items-center gap-1';
+            } else {
+                lineBtn.className = 'px-3 py-1.5 rounded-lg text-xs font-medium bg-emerald-600 text-white transition flex items-center gap-1';
+                barBtn.className = 'px-3 py-1.5 rounded-lg text-xs font-medium text-slate-400 hover:text-white transition flex items-center gap-1';
+            }
+            calculateCompoundGrowth();
+        }
+
+        // اعمال سناریوهای آماده
+        function applyPreset(initial, monthly, rate, years) {
+            initialInput.value = formatWithCommas(initial);
+            initialSlider.value = initial;
+            monthlyInput.value = formatWithCommas(monthly);
+            monthlySlider.value = monthly;
+            rateInput.value = rate;
+            rateSlider.value = rate;
+            yearsInput.value = years;
+            yearsSlider.value = years;
+            calculateCompoundGrowth();
+        }
+
+        function resetDefaults() {
+            applyPreset(50000000, 5000000, 30, 10);
+        }
+
+        // راه‌اندازی اولیه به محض بارگذاری صفحه
+        window.onload = function() {
+            setupSyncListeners();
+            calculateCompoundGrowth();
+        };
+    </script>
+</body>
+</html>
